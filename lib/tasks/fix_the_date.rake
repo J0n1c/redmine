@@ -22,6 +22,7 @@ namespace :fix do
 
     broken_issues.each_with_index do |one_record,ind|
       parsed_data = parse_data one_record.description
+      if parsed_data.empty? then puts "something wrong in header format. [issue=#{one_record.id}]"; next end
       pretty_date = parsed_data[:newdate].strftime("%Y-%m-%d %H:%M:%S %z")
       one_record.created_on = parsed_data[:newdate]
       one_record.description = parsed_data[:data]
@@ -36,6 +37,7 @@ namespace :fix do
 
     broken_comments.each_with_index do |one_record, ind|
       parsed_data = parse_data one_record.notes
+      if parsed_data.empty? then puts "something wrong in header format. [issue=#{one_record.id}]"; next end
       pretty_date = parsed_data[:newdate].strftime("%Y-%m-%d %H:%M:%S %z")
       one_record.created_on = parsed_data[:newdate]
       one_record.notes = parsed_data[:data]
@@ -61,6 +63,7 @@ namespace :fix do
 
     broken_issues.each_with_index do |one_record,ind|
       parsed_data = parse_data one_record.description
+      if parsed_data.empty? then puts "something wrong in header format. [issue=#{one_record.id}]"; next end
       pretty_date = parsed_data[:newdate].strftime("%Y-%m-%d %H:%M:%S %z")
       # puts "#{ind+1} [Issue] " + url + issue_path(one_record) + "\t #{pretty_date}" # + "\t #{parsed_data[:data]}"
       puts "#{ind+1} [Issue] " + url + "/issues/" + one_record.id.to_s + "\t #{pretty_date}" # + "\t #{parsed_data[:data]}"
@@ -68,6 +71,7 @@ namespace :fix do
 
     broken_comments.each_with_index do |one_record, ind|
       parsed_data = parse_data one_record.notes
+      if parsed_data.empty? then puts "something wrong in header format. [issue=#{one_record.id}]"; next end
       pretty_date = parsed_data[:newdate].strftime("%Y-%m-%d %H:%M:%S %z")
       # puts "#{ind+1} [Comment] " + url + issue_path(one_record.journalized_id) + "\t #{pretty_date}" # + "\t #{parsed_data[:data]}"
       puts "#{ind+1} [Comment] " + url + "/issues/" + one_record.journalized_id.to_s + "\t #{pretty_date}" # + "\t #{parsed_data[:data]}"
@@ -99,9 +103,13 @@ namespace :fix do
     if matches && matches.captures.count == 3
       olddate =  matches.captures[0]
       data = matches.captures[2].strip
-      newdate = DateTime.strptime(olddate, date_format)
-      result[:newdate] = newdate
-      result[:data] = data
+      begin
+        newdate = DateTime.strptime(olddate, date_format)
+        result[:newdate] = newdate
+        result[:data] = data
+      rescue => e
+        puts e.inspect + "INVALID DATA: \n #{elem_data}"
+      end
     end
 
     return result
