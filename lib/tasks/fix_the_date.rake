@@ -13,7 +13,8 @@ namespace :fix do
 
   # cut date from data and put it into appropriate field
   def fix_broken
-    url = "http://#{`hostname`.strip}:3000"
+    #url = "http://#{`hostname`.strip}:3000"
+    url = "http://#{`hostname`.strip}"
 
     broken_issues = find_broken("Issue")
     broken_comments = find_broken("Journal")
