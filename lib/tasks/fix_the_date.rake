@@ -21,7 +21,7 @@ def process_the_data model, key
       puts "#{url}\t#{in_date.strftime("%Y-%m-%d %H:%M:%S %z")}"
       if key == "--fix"
         one_record.created_on = in_date
-        model==Issue ? one_record.description : one_record.notes = matches[2].strip
+        model == Issue ? one_record.description = matches[2].strip : one_record.notes = matches[2].strip
         one_record.save!
       end
     end
